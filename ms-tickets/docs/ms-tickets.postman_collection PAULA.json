@@ -1,0 +1,723 @@
+{
+  "info": {
+    "_postman_id": "a4208ac5-d28d-4574-baf5-9b8d1650560e",
+    "name": "ms-tickets",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "48922743"
+  },
+  "item": [
+    {
+      "name": "01 Login administrador",
+      "request": {
+        "auth": {
+          "type": "inherit"
+        },
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\"email\":\"admin@empresa.com\",\"password\":\"Admin2026*\"}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:3001/usuarios/login",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "3001",
+          "path": [
+            "usuarios",
+            "login"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "02 Crear usuario despacho",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwibm9tYnJlIjoiQWRtaW5pc3RyYWRvciBHZW5lcmFsIiwicm9sIjoiYWRtaW5pc3RyYWRvciIsImlhdCI6MTc5NTMyMDE4NiwiZXhwIjoxNzk1MzQ4OTg2fQ.QvZNA2c-uSeJbfBtRRZTVUDi4kxHzEpkD0469U6mr2o",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\"nombre\":\"Usuario Despacho\",\"email\":\"despacho.prueba@empresa.com\",\"password\":\"Despacho2026*\",\"rol\":\"despacho\"}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:3001/usuarios",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "3001",
+          "path": [
+            "usuarios"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "03 Login despacho",
+      "request": {
+        "auth": {
+          "type": "inherit"
+        },
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\"email\":\"despacho.prueba@empresa.com\",\"password\":\"Despacho2026*\"}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:3001/usuarios/login",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "3001",
+          "path": [
+            "usuarios",
+            "login"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "04 GET lista de tickets (200)",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwibm9tYnJlIjoiQWRtaW5pc3RyYWRvciBHZW5lcmFsIiwicm9sIjoiYWRtaW5pc3RyYWRvciIsImlhdCI6MTc5NTMyMDE4NiwiZXhwIjoxNzk1MzQ4OTg2fQ.QvZNA2c-uSeJbfBtRRZTVUDi4kxHzEpkD0469U6mr2o",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://127.0.0.1:3011/tickets",
+          "protocol": "http",
+          "host": [
+            "127",
+            "0",
+            "0",
+            "1"
+          ],
+          "port": "3011",
+          "path": [
+            "tickets"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "05 GET filtro prioridad=alta (200)",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwibm9tYnJlIjoiQWRtaW5pc3RyYWRvciBHZW5lcmFsIiwicm9sIjoiYWRtaW5pc3RyYWRvciIsImlhdCI6MTc5NTMyMDE4NiwiZXhwIjoxNzk1MzQ4OTg2fQ.QvZNA2c-uSeJbfBtRRZTVUDi4kxHzEpkD0469U6mr2o",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://127.0.0.1:3011/tickets?prioridad=alta",
+          "protocol": "http",
+          "host": [
+            "127",
+            "0",
+            "0",
+            "1"
+          ],
+          "port": "3011",
+          "path": [
+            "tickets"
+          ],
+          "query": [
+            {
+              "key": "prioridad",
+              "value": "alta"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "06 GET ticket por id (200)",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwibm9tYnJlIjoiQWRtaW5pc3RyYWRvciBHZW5lcmFsIiwicm9sIjoiYWRtaW5pc3RyYWRvciIsImlhdCI6MTc5NTMyMDE4NiwiZXhwIjoxNzk1MzQ4OTg2fQ.QvZNA2c-uSeJbfBtRRZTVUDi4kxHzEpkD0469U6mr2o",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://127.0.0.1:3011/tickets/1",
+          "protocol": "http",
+          "host": [
+            "127",
+            "0",
+            "0",
+            "1"
+          ],
+          "port": "3011",
+          "path": [
+            "tickets",
+            "1"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "07 GET id inexistente (404)",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwibm9tYnJlIjoiQWRtaW5pc3RyYWRvciBHZW5lcmFsIiwicm9sIjoiYWRtaW5pc3RyYWRvciIsImlhdCI6MTc5NTMyMDE4NiwiZXhwIjoxNzk1MzQ4OTg2fQ.QvZNA2c-uSeJbfBtRRZTVUDi4kxHzEpkD0469U6mr2o",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://127.0.0.1:3011/tickets/999",
+          "protocol": "http",
+          "host": [
+            "127",
+            "0",
+            "0",
+            "1"
+          ],
+          "port": "3011",
+          "path": [
+            "tickets",
+            "999"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "08 GET con rol despacho (200)",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6Nywibm9tYnJlIjoiVXN1YXJpbyBEZXNwYWNobyIsInJvbCI6ImRlc3BhY2hvIiwiaWF0IjoxNzk1MzIwMjY1LCJleHAiOjE3OTUzNDkwNjV9.Ef9AkJ9PVpJQkPgxK2NtBs_w_gBrj1oqJqUikppo2aw",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://127.0.0.1:3011/tickets",
+          "protocol": "http",
+          "host": [
+            "127",
+            "0",
+            "0",
+            "1"
+          ],
+          "port": "3011",
+          "path": [
+            "tickets"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "09 POST crear ticket (201)",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwibm9tYnJlIjoiQWRtaW5pc3RyYWRvciBHZW5lcmFsIiwicm9sIjoiYWRtaW5pc3RyYWRvciIsImlhdCI6MTc5NTMyMDE4NiwiZXhwIjoxNzk1MzQ4OTg2fQ.QvZNA2c-uSeJbfBtRRZTVUDi4kxHzEpkD0469U6mr2o",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\"numero\":\"T-900\",\"asunto\":\"Ticket de prueba\",\"prioridad\":\"media\",\"estado\":\"abierto\",\"fecha\":\"2026-11-21\"}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://127.0.0.1:3011/tickets",
+          "protocol": "http",
+          "host": [
+            "127",
+            "0",
+            "0",
+            "1"
+          ],
+          "port": "3011",
+          "path": [
+            "tickets"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "10 POST numero repetido (409)",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwibm9tYnJlIjoiQWRtaW5pc3RyYWRvciBHZW5lcmFsIiwicm9sIjoiYWRtaW5pc3RyYWRvciIsImlhdCI6MTc5NTMyMDE4NiwiZXhwIjoxNzk1MzQ4OTg2fQ.QvZNA2c-uSeJbfBtRRZTVUDi4kxHzEpkD0469U6mr2o",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\"numero\":\"T-900\",\"asunto\":\"Ticket de prueba\",\"prioridad\":\"media\",\"estado\":\"abierto\",\"fecha\":\"2026-11-21\"}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://127.0.0.1:3011/tickets",
+          "protocol": "http",
+          "host": [
+            "127",
+            "0",
+            "0",
+            "1"
+          ],
+          "port": "3011",
+          "path": [
+            "tickets"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "11 POST datos inválidos (400)",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwibm9tYnJlIjoiQWRtaW5pc3RyYWRvciBHZW5lcmFsIiwicm9sIjoiYWRtaW5pc3RyYWRvciIsImlhdCI6MTc5NTMyMDE4NiwiZXhwIjoxNzk1MzQ4OTg2fQ.QvZNA2c-uSeJbfBtRRZTVUDi4kxHzEpkD0469U6mr2o",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\"numero\":\"\",\"asunto\":\"x\",\"prioridad\":\"urgente\",\"estado\":\"abierto\",\"fecha\":\"2026-02-31\"}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://127.0.0.1:3011/tickets",
+          "protocol": "http",
+          "host": [
+            "127",
+            "0",
+            "0",
+            "1"
+          ],
+          "port": "3011",
+          "path": [
+            "tickets"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "12 PUT actualizar ticket (200)",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwibm9tYnJlIjoiQWRtaW5pc3RyYWRvciBHZW5lcmFsIiwicm9sIjoiYWRtaW5pc3RyYWRvciIsImlhdCI6MTc5NTMyMDE4NiwiZXhwIjoxNzk1MzQ4OTg2fQ.QvZNA2c-uSeJbfBtRRZTVUDi4kxHzEpkD0469U6mr2o",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "PUT",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\"numero\":\"T-900\",\"asunto\":\"Ticket de prueba\",\"prioridad\":\"media\",\"estado\":\"cerrado\",\"fecha\":\"2026-11-21\"}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://127.0.0.1:3011/tickets/4",
+          "protocol": "http",
+          "host": [
+            "127",
+            "0",
+            "0",
+            "1"
+          ],
+          "port": "3011",
+          "path": [
+            "tickets",
+            "4"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "13 PUT id inexistente (404)",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwibm9tYnJlIjoiQWRtaW5pc3RyYWRvciBHZW5lcmFsIiwicm9sIjoiYWRtaW5pc3RyYWRvciIsImlhdCI6MTc5NTMyMDE4NiwiZXhwIjoxNzk1MzQ4OTg2fQ.QvZNA2c-uSeJbfBtRRZTVUDi4kxHzEpkD0469U6mr2o",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "PUT",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\"numero\":\"T-NOEXISTE\",\"asunto\":\"x\",\"prioridad\":\"baja\",\"estado\":\"abierto\",\"fecha\":\"2026-11-21\"}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://127.0.0.1:3011/tickets/9999",
+          "protocol": "http",
+          "host": [
+            "127",
+            "0",
+            "0",
+            "1"
+          ],
+          "port": "3011",
+          "path": [
+            "tickets",
+            "9999"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "14 GET sin token (401)",
+      "request": {
+        "auth": {
+          "type": "noauth"
+        },
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://127.0.0.1:3011/tickets",
+          "protocol": "http",
+          "host": [
+            "127",
+            "0",
+            "0",
+            "1"
+          ],
+          "port": "3011",
+          "path": [
+            "tickets"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "15 GET token inválido (401)",
+      "protocolProfileBehavior": {
+        "disableBodyPruning": true
+      },
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "123abc",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\"numero\":\"T-403\",\"asunto\":\"x\",\"prioridad\":\"baja\",\"estado\":\"abierto\",\"fecha\":\"2026-11-21\"}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://127.0.0.1:3011/tickets",
+          "protocol": "http",
+          "host": [
+            "127",
+            "0",
+            "0",
+            "1"
+          ],
+          "port": "3011",
+          "path": [
+            "tickets"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "16 POST con rol despacho (403)",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6Nywibm9tYnJlIjoiVXN1YXJpbyBEZXNwYWNobyIsInJvbCI6ImRlc3BhY2hvIiwiaWF0IjoxNzk1MzIwMjY1LCJleHAiOjE3OTUzNDkwNjV9.Ef9AkJ9PVpJQkPgxK2NtBs_w_gBrj1oqJqUikppo2aw",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\"numero\":\"T-403\",\"asunto\":\"x\",\"prioridad\":\"baja\",\"estado\":\"abierto\",\"fecha\":\"2026-11-21\"}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://127.0.0.1:3011/tickets",
+          "protocol": "http",
+          "host": [
+            "127",
+            "0",
+            "0",
+            "1"
+          ],
+          "port": "3011",
+          "path": [
+            "tickets"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "17 DELETE con rol despacho (403)",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6Nywibm9tYnJlIjoiVXN1YXJpbyBEZXNwYWNobyIsInJvbCI6ImRlc3BhY2hvIiwiaWF0IjoxNzk1MzIwMjY1LCJleHAiOjE3OTUzNDkwNjV9.Ef9AkJ9PVpJQkPgxK2NtBs_w_gBrj1oqJqUikppo2aw",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "DELETE",
+        "header": [],
+        "url": {
+          "raw": "http://127.0.0.1:3011/tickets/1",
+          "protocol": "http",
+          "host": [
+            "127",
+            "0",
+            "0",
+            "1"
+          ],
+          "port": "3011",
+          "path": [
+            "tickets",
+            "1"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "18 DELETE ticket (204)",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwibm9tYnJlIjoiQWRtaW5pc3RyYWRvciBHZW5lcmFsIiwicm9sIjoiYWRtaW5pc3RyYWRvciIsImlhdCI6MTc5NTMyMDE4NiwiZXhwIjoxNzk1MzQ4OTg2fQ.QvZNA2c-uSeJbfBtRRZTVUDi4kxHzEpkD0469U6mr2o",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "DELETE",
+        "header": [],
+        "url": {
+          "raw": "http://127.0.0.1:3011/tickets/1",
+          "protocol": "http",
+          "host": [
+            "127",
+            "0",
+            "0",
+            "1"
+          ],
+          "port": "3011",
+          "path": [
+            "tickets",
+            "1"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "19 DELETE ya borrado (404)",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwibm9tYnJlIjoiQWRtaW5pc3RyYWRvciBHZW5lcmFsIiwicm9sIjoiYWRtaW5pc3RyYWRvciIsImlhdCI6MTc5NTMyMDE4NiwiZXhwIjoxNzk1MzQ4OTg2fQ.QvZNA2c-uSeJbfBtRRZTVUDi4kxHzEpkD0469U6mr2o",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "DELETE",
+        "header": [],
+        "url": {
+          "raw": "http://127.0.0.1:3011/tickets/1",
+          "protocol": "http",
+          "host": [
+            "127",
+            "0",
+            "0",
+            "1"
+          ],
+          "port": "3011",
+          "path": [
+            "tickets",
+            "1"
+          ]
+        }
+      },
+      "response": []
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{tokenAdmin}}",
+        "type": "string"
+      }
+    ]
+  },
+  "variable": [
+    {
+      "key": "tokenAdmin",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "tokenDespacho",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "idCreado",
+      "value": "",
+      "type": "string"
+    }
+  ]
+}
