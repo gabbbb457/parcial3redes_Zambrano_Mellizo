@@ -1,0 +1,1130 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gestión de Tickets y Equipos · Microservicios</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+          },
+        },
+      },
+    };
+  </script>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans antialiased min-h-screen flex flex-col">
+
+  <!-- Top Navigation & Connection Bar -->
+  <header class="bg-slate-900 text-white border-b border-slate-800 sticky top-0 z-30 shadow-sm">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex flex-wrap items-center justify-between gap-3">
+      <!-- Brand -->
+      <div class="flex items-center gap-3">
+        <div class="w-9 h-9 rounded-xl bg-indigo-600 flex items-center justify-center shadow-inner">
+          <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 6v.75m0 3v.75m0 3v.75m0 3V18m-9-5.25h5.25M7.5 15h3M3.375 5.25c-.621 0-1.125.504-1.125 1.125v3.026a2.999 2.999 0 010 5.198v3.026c0 .621.504 1.125 1.125 1.125h17.25c.621 0 1.125-.504 1.125-1.125v-3.026a2.999 2.999 0 010-5.198V6.375c0-.621-.504-1.125-1.125-1.125H3.375z" />
+          </svg>
+        </div>
+        <div>
+          <h1 class="text-base sm:text-lg font-bold tracking-tight leading-tight">Mesa de Soporte TI</h1>
+          <p class="text-xs text-slate-400">ms-usuarios · ms-tickets · ms-equipos</p>
+        </div>
+      </div>
+
+      <!-- Right Controls: Mode Switch, Auth Status & Config Toggle -->
+      <div class="flex flex-wrap items-center gap-2 sm:gap-3">
+        <!-- Mode Toggle -->
+        <div class="inline-flex rounded-xl bg-slate-800 p-1 border border-slate-700">
+          <button id="btnModeReal" type="button" onclick="setAppMode('real')"
+            class="px-3 py-1.5 rounded-lg text-xs font-semibold transition bg-indigo-600 text-white shadow">
+            API Real
+          </button>
+          <button id="btnModeDemo" type="button" onclick="setAppMode('demo')"
+            class="px-3 py-1.5 rounded-lg text-xs font-semibold transition text-slate-300 hover:text-white">
+            Modo Demo
+          </button>
+        </div>
+
+        <!-- Auth Badge Button -->
+        <button type="button" onclick="toggleDrawer('authDrawer')"
+          class="inline-flex items-center gap-2 px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-xs font-medium transition">
+          <span id="authDot" class="w-2 h-2 rounded-full bg-rose-500"></span>
+          <span id="authBadgeText">Sin Token JWT</span>
+        </button>
+
+        <!-- API Config Toggle -->
+        <button type="button" onclick="toggleDrawer('configDrawer')"
+          class="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-xs font-medium text-slate-200 transition">
+          <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M10.343 3.94c.09-.542.56-.94 1.11-.94h1.093c.55 0 1.02.398 1.11.94l.149.894c.07.424.384.764.78.93.398.164.855.142 1.205-.108l.737-.527a1.125 1.125 0 011.45.12l.773.774c.39.389.44 1.002.12 1.45l-.527.737c-.25.35-.272.806-.107 1.204.165.397.505.71.93.78l.893.15c.543.09.94.56.94 1.109v1.094c0 .55-.397 1.02-.94 1.11l-.893.149c-.425.07-.765.383-.93.78-.165.398-.143.854.107 1.204l.527.738c.32.447.269 1.06-.12 1.45l-.774.773a1.125 1.125 0 01-1.449.12l-.738-.527c-.35-.25-.806-.272-1.203-.107-.397.165-.71.505-.781.929l-.149.894c-.09.542-.56.94-1.11.94h-1.094c-.55 0-1.019-.398-1.11-.94l-.148-.894c-.071-.424-.384-.764-.781-.93-.398-.164-.854-.142-1.204.108l-.738.527c-.447.32-1.06.269-1.45-.12l-.773-.774a1.125 1.125 0 01-.12-1.45l.527-.737c.25-.35.273-.806.108-1.204-.165-.397-.505-.71-.93-.78l-.894-.15c-.542-.09-.94-.56-.94-1.109v-1.094c0-.55.398-1.02.94-1.11l.894-.149c.424-.07.765-.383.93-.78.165-.398.143-.854-.107-1.204l-.527-.738a1.125 1.125 0 01.12-1.45l.773-.773a1.125 1.125 0 011.45-.12l.737.527c.35.25.807.272 1.204.107.397-.165.71-.505.78-.929l.15-.894z" />
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+          </svg>
+          <span>Endpoints</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Collapsible Auth / Login Drawer -->
+    <div id="authDrawer" class="hidden bg-slate-800/95 border-t border-slate-700">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <!-- Quick Login Form -->
+        <form onsubmit="handleLogin(event)" class="bg-slate-900/80 p-4 rounded-xl border border-slate-700 space-y-3">
+          <div class="flex items-center justify-between">
+            <h2 class="text-xs font-semibold uppercase tracking-wider text-indigo-400">1. Iniciar Sesión (ms-usuarios)</h2>
+            <span class="text-[11px] text-slate-400">POST /auth/login</span>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+            <input id="loginEmail" type="email" placeholder="Correo (ej. admin@empresa.com)" required
+              class="w-full px-3 py-2 rounded-lg bg-slate-800 border border-slate-700 text-xs text-white placeholder-slate-400 focus:outline-none focus:border-indigo-500" />
+            <input id="loginPassword" type="password" placeholder="Contraseña" required
+              class="w-full px-3 py-2 rounded-lg bg-slate-800 border border-slate-700 text-xs text-white placeholder-slate-400 focus:outline-none focus:border-indigo-500" />
+          </div>
+          <div class="flex items-center justify-between gap-2">
+            <span id="loginFeedback" class="text-xs text-slate-400 truncate">Obtén el Bearer Token automáticamente</span>
+            <button type="submit" id="btnLogin"
+              class="px-4 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-xs font-semibold text-white transition shrink-0">
+              Obtener Token
+            </button>
+          </div>
+        </form>
+
+        <!-- Direct Bearer Token Paste -->
+        <div class="bg-slate-900/80 p-4 rounded-xl border border-slate-700 space-y-3">
+          <div class="flex items-center justify-between">
+            <h2 class="text-xs font-semibold uppercase tracking-wider text-emerald-400">2. Token JWT Activo (Authorization: Bearer)</h2>
+            <button type="button" onclick="clearToken()" class="text-[11px] text-rose-400 hover:text-rose-300 font-medium">
+              Limpiar Token
+            </button>
+          </div>
+          <input id="jwtTokenInput" type="text" placeholder="Pega aquí tu token JWT (eyJhbGciOi...)"
+            oninput="saveManualToken(this.value)"
+            class="w-full px-3 py-2 rounded-lg bg-slate-800 border border-slate-700 text-xs font-mono text-emerald-300 placeholder-slate-500 focus:outline-none focus:border-emerald-500" />
+          <p class="text-[11px] text-slate-400">
+            Se guarda en tu navegador y se envía en todas las peticiones a <code class="text-slate-200">ms-tickets</code> y <code class="text-slate-200">ms-equipos</code>. Déjalo vacío para probar el error <code class="text-amber-300">401 Unauthorized</code>.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Collapsible Endpoints Configuration Drawer -->
+    <div id="configDrawer" class="hidden bg-slate-800/95 border-t border-slate-700">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 space-y-3">
+        <div class="flex items-center justify-between">
+          <h2 class="text-xs font-semibold uppercase tracking-wider text-slate-300">Configuración de URLs de Microservicios</h2>
+          <button type="button" onclick="resetUrls()" class="text-xs text-indigo-400 hover:text-indigo-300">Restaurar por defecto</button>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+          <div>
+            <label class="block text-[11px] text-slate-400 mb-1">ms-usuarios (Auth)</label>
+            <input id="urlUsuarios" type="text" value="http://127.0.0.1:3010" onchange="saveUrls()"
+              class="w-full px-3 py-2 rounded-lg bg-slate-900 border border-slate-700 text-xs font-mono text-white focus:outline-none focus:border-indigo-500" />
+          </div>
+          <div>
+            <label class="block text-[11px] text-slate-400 mb-1">ms-tickets (Tickets & Composición)</label>
+            <input id="urlTickets" type="text" value="http://127.0.0.1:3011" onchange="saveUrls()"
+              class="w-full px-3 py-2 rounded-lg bg-slate-900 border border-slate-700 text-xs font-mono text-white focus:outline-none focus:border-indigo-500" />
+          </div>
+          <div>
+            <label class="block text-[11px] text-slate-400 mb-1">ms-equipos (Inventario)</label>
+            <input id="urlEquipos" type="text" value="http://127.0.0.1:3012" onchange="saveUrls()"
+              class="w-full px-3 py-2 rounded-lg bg-slate-900 border border-slate-700 text-xs font-mono text-white focus:outline-none focus:border-indigo-500" />
+          </div>
+        </div>
+        <p class="text-[11px] text-slate-400">
+          Nota: Si abres este HTML directamente y tu backend Node.js aún no tiene habilitado <code class="text-slate-200">CORS</code>, el navegador bloqueará <code class="text-slate-200">fetch</code> y podrás usar <strong class="text-white">Modo Demo</strong> o habilitar <code class="text-slate-200">Access-Control-Allow-Origin: *</code> en tus servicios.
+        </p>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+
+    <!-- CORS / Connection Alert Banner (Hidden by default, shown on network error) -->
+    <div id="networkBanner" class="hidden rounded-2xl bg-amber-50 border border-amber-200 p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+      <div class="flex items-start gap-3">
+        <div class="p-2 rounded-xl bg-amber-100 text-amber-700 shrink-0">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
+          </svg>
+        </div>
+        <div>
+          <h3 class="text-sm font-semibold text-amber-900">No se pudo conectar con uno de los microservicios locales</h3>
+          <p id="networkBannerMsg" class="text-xs text-amber-800 mt-0.5">
+            Verifica que <code>ms-tickets</code> (3011) y <code>ms-equipos</code> (3012) estén corriendo y permitan CORS desde el navegador, o activa el <strong>Modo Demo</strong> para probar la interfaz al instante.
+          </p>
+        </div>
+      </div>
+      <button type="button" onclick="setAppMode('demo')"
+        class="px-4 py-2 rounded-xl bg-amber-600 hover:bg-amber-700 text-white text-xs font-semibold transition shrink-0 shadow-sm">
+        Cambiar a Modo Demo
+      </button>
+    </div>
+
+    <!-- KPI Cards -->
+    <section class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div class="bg-white rounded-2xl p-4 sm:p-5 border border-slate-200/80 shadow-sm">
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-medium text-slate-500">Total Tickets</span>
+          <span class="p-2 rounded-xl bg-indigo-50 text-indigo-600">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 002.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 00-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75 2.25 2.25 0 00-.1-.664m-5.8 0A2.251 2.251 0 0113.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25z" />
+            </svg>
+          </span>
+        </div>
+        <p id="kpiTotal" class="text-2xl sm:text-3xl font-bold text-slate-900 mt-2">0</p>
+        <p class="text-[11px] text-slate-400 mt-1">Registrados en tickets_db</p>
+      </div>
+
+      <div class="bg-white rounded-2xl p-4 sm:p-5 border border-slate-200/80 shadow-sm">
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-medium text-slate-500">Abiertos</span>
+          <span class="p-2 rounded-xl bg-amber-50 text-amber-600">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          </span>
+        </div>
+        <p id="kpiAbiertos" class="text-2xl sm:text-3xl font-bold text-slate-900 mt-2">0</p>
+        <p class="text-[11px] text-slate-400 mt-1">Pendientes de atención</p>
+      </div>
+
+      <div class="bg-white rounded-2xl p-4 sm:p-5 border border-slate-200/80 shadow-sm">
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-medium text-slate-500">Prioridad Alta</span>
+          <span class="p-2 rounded-xl bg-rose-50 text-rose-600">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M15.362 5.214A8.252 8.252 0 0112 21 8.25 8.25 0 016.038 7.048 8.287 8.287 0 009 9.6a8.983 8.983 0 013.361-6.867 8.21 8.21 0 003 2.48z" />
+            </svg>
+          </span>
+        </div>
+        <p id="kpiAlta" class="text-2xl sm:text-3xl font-bold text-slate-900 mt-2">0</p>
+        <p class="text-[11px] text-slate-400 mt-1">Incidencias críticas</p>
+      </div>
+
+      <div class="bg-white rounded-2xl p-4 sm:p-5 border border-slate-200/80 shadow-sm">
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-medium text-slate-500">Cerrados</span>
+          <span class="p-2 rounded-xl bg-emerald-50 text-emerald-600">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          </span>
+        </div>
+        <p id="kpiCerrados" class="text-2xl sm:text-3xl font-bold text-slate-900 mt-2">0</p>
+        <p class="text-[11px] text-slate-400 mt-1">Resueltos satisfactoriamente</p>
+      </div>
+    </section>
+
+    <!-- Main Two-Column Workspace -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+
+      <!-- Left Column: Create Ticket Form & HTTP Response Inspector -->
+      <section class="lg:col-span-5 space-y-5">
+        <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden">
+          <div class="px-5 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/60">
+            <div>
+              <h2 class="text-sm font-bold text-slate-900">Crear Nuevo Ticket</h2>
+              <p class="text-xs text-slate-500">Valida equipo en <code class="text-indigo-600">ms-equipos</code> antes de guardar</p>
+            </div>
+            <span class="px-2.5 py-1 rounded-lg bg-indigo-50 text-indigo-700 text-[11px] font-mono font-semibold">POST /tickets</span>
+          </div>
+
+          <form id="ticketForm" onsubmit="handleCreateTicket(event)" class="p-5 space-y-4">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+              <div>
+                <label for="ticketNumero" class="block text-xs font-semibold text-slate-700 mb-1">Número de Ticket *</label>
+                <input id="ticketNumero" type="text" required placeholder="TK-9001-1" value="TK-9001-1"
+                  class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500" />
+              </div>
+
+              <div>
+                <label for="ticketFecha" class="block text-xs font-semibold text-slate-700 mb-1">Fecha (AAAA-MM-DD) *</label>
+                <input id="ticketFecha" type="date" required value="2026-11-24"
+                  class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500" />
+              </div>
+            </div>
+
+            <div>
+              <label for="ticketAsunto" class="block text-xs font-semibold text-slate-700 mb-1">Asunto *</label>
+              <input id="ticketAsunto" type="text" required placeholder="Ej. Falla en tarjeta de red o puerto Ethernet"
+                class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500" />
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+              <div>
+                <label for="ticketPrioridad" class="block text-xs font-semibold text-slate-700 mb-1">Prioridad *</label>
+                <select id="ticketPrioridad"
+                  class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500">
+                  <option value="baja">Baja</option>
+                  <option value="media" selected>Media</option>
+                  <option value="alta">Alta</option>
+                </select>
+              </div>
+
+              <div>
+                <label for="ticketEstado" class="block text-xs font-semibold text-slate-700 mb-1">Estado *</label>
+                <select id="ticketEstado"
+                  class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500">
+                  <option value="abierto" selected>Abierto</option>
+                  <option value="cerrado">Cerrado</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Equipo ID selector + direct numeric override for testing edge cases -->
+            <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200/80 space-y-2.5">
+              <div class="flex items-center justify-between">
+                <label for="ticketEquipoId" class="text-xs font-semibold text-slate-700">ID del Equipo Asociado (`equipo_id`) *</label>
+                <span class="text-[11px] text-slate-400">Entero positivo</span>
+              </div>
+              <div class="grid grid-cols-12 gap-2">
+                <input id="ticketEquipoId" type="number" min="1" step="1" required value="1"
+                  class="col-span-4 px-3 py-2 rounded-xl border border-slate-300 bg-white text-sm font-mono font-semibold text-slate-800 focus:outline-none focus:border-indigo-500" />
+                <select id="equipoQuickSelect" onchange="if(this.value) document.getElementById('ticketEquipoId').value = this.value"
+                  class="col-span-8 px-3 py-2 rounded-xl border border-slate-300 bg-white text-xs text-slate-700 focus:outline-none focus:border-indigo-500">
+                  <option value="1">#1 · Laptop Dell Latitude 5430</option>
+                </select>
+              </div>
+              <p class="text-[11px] text-slate-500">
+                Tip de pruebas: escribe <code class="text-slate-700 font-semibold">999</code> para probar <code class="text-rose-600">404</code> o selecciona un equipo en mantenimiento para probar <code class="text-amber-600">400</code>.
+              </p>
+            </div>
+
+            <div class="pt-1 flex items-center gap-2.5">
+              <button id="btnSubmitTicket" type="submit"
+                class="flex-1 py-2.5 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 text-white text-sm font-semibold shadow-sm transition flex items-center justify-center gap-2">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                </svg>
+                <span>Registrar Ticket</span>
+              </button>
+              <button type="button" onclick="incrementTicketNumber()" title="Generar siguiente número"
+                class="px-3.5 py-2.5 rounded-xl border border-slate-300 hover:bg-slate-50 text-slate-600 text-xs font-medium transition">
+                +1 Num
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Live HTTP Inspector Card -->
+        <div class="bg-slate-900 text-slate-100 rounded-2xl border border-slate-800 shadow-sm overflow-hidden">
+          <div class="px-4 py-3 border-b border-slate-800 flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <span class="text-xs font-semibold text-slate-300">Última Respuesta HTTP</span>
+              <span id="httpStatusBadge" class="px-2 py-0.5 rounded-md text-[11px] font-mono font-bold bg-slate-800 text-slate-400">
+                LISTO
+              </span>
+            </div>
+            <span id="httpEndpointLabel" class="text-[11px] font-mono text-slate-400 truncate max-w-[180px]">—</span>
+          </div>
+          <pre id="httpResponseBox" class="p-4 text-xs font-mono text-emerald-300 overflow-x-auto max-h-56 leading-relaxed">{
+  "mensaje": "Envía una petición para inspeccionar el código HTTP y el JSON de respuesta."
+}</pre>
+        </div>
+      </section>
+
+      <!-- Right Column: Tabs for Tickets & Equipos -->
+      <section class="lg:col-span-7 bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden">
+        <!-- Tabs Header -->
+        <div class="px-5 pt-4 border-b border-slate-200 flex flex-wrap items-center justify-between gap-3 bg-slate-50/50">
+          <div class="flex items-center gap-1">
+            <button id="tabBtnTickets" type="button" onclick="switchTab('tickets')"
+              class="px-4 py-2.5 text-sm font-semibold border-b-2 border-indigo-600 text-indigo-600 -mb-px transition">
+              Tickets <span id="badgeCountTickets" class="ml-1 px-2 py-0.5 rounded-full text-xs bg-indigo-100 text-indigo-700">0</span>
+            </button>
+            <button id="tabBtnEquipos" type="button" onclick="switchTab('equipos')"
+              class="px-4 py-2.5 text-sm font-semibold border-b-2 border-transparent text-slate-500 hover:text-slate-700 -mb-px transition">
+              Equipos <span id="badgeCountEquipos" class="ml-1 px-2 py-0.5 rounded-full text-xs bg-slate-100 text-slate-600">0</span>
+            </button>
+          </div>
+
+          <button type="button" onclick="refreshAllData()"
+            class="mb-2 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-slate-300 bg-white hover:bg-slate-50 text-xs font-semibold text-slate-700 transition">
+            <svg id="refreshIcon" class="w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" />
+            </svg>
+            <span>Refrescar</span>
+          </button>
+        </div>
+
+        <!-- TAB 1: TICKETS VIEW -->
+        <div id="tabViewTickets" class="p-5 space-y-4">
+          <!-- Filters Bar -->
+          <div class="grid grid-cols-1 sm:grid-cols-12 gap-2.5">
+            <div class="sm:col-span-6 relative">
+              <input id="searchTickets" type="text" placeholder="Buscar por número, asunto o equipo..."
+                oninput="renderTickets()"
+                class="w-full pl-9 pr-3 py-2 rounded-xl border border-slate-300 text-xs focus:outline-none focus:border-indigo-500" />
+              <svg class="w-4 h-4 text-slate-400 absolute left-3 top-2.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+              </svg>
+            </div>
+            <select id="filterEstado" onchange="renderTickets()"
+              class="sm:col-span-3 px-3 py-2 rounded-xl border border-slate-300 text-xs bg-white focus:outline-none focus:border-indigo-500">
+              <option value="todos">Estado: Todos</option>
+              <option value="abierto">Abiertos</option>
+              <option value="cerrado">Cerrados</option>
+            </select>
+            <select id="filterPrioridad" onchange="renderTickets()"
+              class="sm:col-span-3 px-3 py-2 rounded-xl border border-slate-300 text-xs bg-white focus:outline-none focus:border-indigo-500">
+              <option value="todas">Prioridad: Todas</option>
+              <option value="alta">Alta</option>
+              <option value="media">Media</option>
+              <option value="baja">Baja</option>
+            </select>
+          </div>
+
+          <!-- Tickets List Container -->
+          <div id="ticketsListContainer" class="space-y-3">
+            <!-- Populated by JS -->
+          </div>
+        </div>
+
+        <!-- TAB 2: EQUIPOS VIEW -->
+        <div id="tabViewEquipos" class="hidden p-5 space-y-5">
+          <!-- Quick Create Equipo Form -->
+          <form onsubmit="handleCreateEquipo(event)" class="p-4 rounded-xl bg-slate-50 border border-slate-200/80 space-y-3">
+            <div class="flex items-center justify-between">
+              <h3 class="text-xs font-bold text-slate-800 uppercase tracking-wide">Registrar Nuevo Equipo</h3>
+              <span class="text-[11px] font-mono text-indigo-600">POST /equipos</span>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+              <input id="equipoNombre" type="text" required placeholder="Nombre (ej. Switch Cisco 2960)"
+                class="px-3 py-2 rounded-xl border border-slate-300 bg-white text-xs focus:outline-none focus:border-indigo-500" />
+              <input id="equipoSerial" type="text" required placeholder="Serial / Código (ej. EQ-105)"
+                class="px-3 py-2 rounded-xl border border-slate-300 bg-white text-xs focus:outline-none focus:border-indigo-500" />
+              <select id="equipoEstado"
+                class="px-3 py-2 rounded-xl border border-slate-300 bg-white text-xs focus:outline-none focus:border-indigo-500">
+                <option value="disponible">disponible</option>
+                <option value="activo">activo</option>
+                <option value="mantenimiento">mantenimiento</option>
+                <option value="inactivo">inactivo</option>
+              </select>
+            </div>
+            <div class="flex justify-end">
+              <button type="submit"
+                class="px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold transition">
+                Guardar Equipo
+              </button>
+            </div>
+          </form>
+
+          <!-- Equipos Table -->
+          <div class="overflow-x-auto border border-slate-200 rounded-xl">
+            <table class="w-full text-left border-collapse">
+              <thead>
+                <tr class="bg-slate-50 border-b border-slate-200 text-[11px] font-semibold uppercase text-slate-500">
+                  <th class="py-2.5 px-3.5">ID</th>
+                  <th class="py-2.5 px-3.5">Equipo</th>
+                  <th class="py-2.5 px-3.5">Serial / Código</th>
+                  <th class="py-2.5 px-3.5">Estado</th>
+                  <th class="py-2.5 px-3.5 text-right">Acción</th>
+                </tr>
+              </thead>
+              <tbody id="equiposTableBody" class="divide-y divide-slate-100 text-xs">
+                <!-- Populated by JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <!-- JSON Payload Modal -->
+  <div id="jsonModal" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4" onclick="if(event.target===this) closeJsonModal()">
+    <div class="bg-white rounded-2xl max-w-lg w-full shadow-xl border border-slate-200 overflow-hidden">
+      <div class="px-5 py-3.5 border-b border-slate-100 flex items-center justify-between">
+        <h3 id="jsonModalTitle" class="text-sm font-bold text-slate-900">Detalle JSON del Ticket</h3>
+        <button type="button" onclick="closeJsonModal()" class="p-1 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+      <div class="p-5 bg-slate-900">
+        <pre id="jsonModalContent" class="text-xs font-mono text-emerald-300 overflow-x-auto max-h-80 leading-relaxed"></pre>
+      </div>
+      <div class="px-5 py-3 bg-slate-50 border-t border-slate-100 flex justify-end gap-2">
+        <button type="button" onclick="copyModalJson()"
+          class="px-3.5 py-2 rounded-xl border border-slate-300 bg-white hover:bg-slate-50 text-xs font-semibold text-slate-700 transition">
+          Copiar JSON
+        </button>
+        <button type="button" onclick="closeJsonModal()"
+          class="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold transition">
+          Cerrar
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div id="toast" class="hidden fixed bottom-5 right-5 z-50 max-w-sm bg-slate-900 text-white px-4 py-3 rounded-xl shadow-lg border border-slate-700 text-xs font-medium flex items-center gap-2.5">
+    <span id="toastDot" class="w-2 h-2 rounded-full bg-emerald-400 shrink-0"></span>
+    <span id="toastMsg">Mensaje</span>
+  </div>
+
+  <script>
+    // =========================================================================
+    // STATE & DEFAULT DEMO DATA
+    // =========================================================================
+    const DEFAULT_URLS = {
+      usuarios: 'http://127.0.0.1:3010',
+      tickets: 'http://127.0.0.1:3011',
+      equipos: 'http://127.0.0.1:3012',
+    };
+
+    const DEMO_EQUIPOS_INITIAL = [
+      { id: 1, nombre: 'Laptop Dell Latitude 5430', serial: 'EQ-001-DL', estado: 'disponible' },
+      { id: 2, nombre: 'Switch Cisco Catalyst 2960', serial: 'EQ-002-CS', estado: 'disponible' },
+      { id: 3, nombre: 'Servidor HP ProLiant DL380', serial: 'EQ-003-HP', estado: 'mantenimiento' },
+      { id: 4, nombre: 'Router MikroTik RB4011', serial: 'EQ-004-MK', estado: 'disponible' },
+    ];
+
+    const DEMO_TICKETS_INITIAL = [
+      {
+        id: 1,
+        numero: 'TK-9001-0',
+        asunto: 'Pérdida de paquetes en interfaz GigabitEthernet0/1',
+        prioridad: 'alta',
+        estado: 'abierto',
+        fecha: '2026-11-24',
+        equipo_id: 2,
+        equipo: { id: 2, nombre: 'Switch Cisco Catalyst 2960', serial: 'EQ-002-CS', estado: 'disponible' },
+      },
+      {
+        id: 2,
+        numero: 'TK-9002-0',
+        asunto: 'Actualización de certificados SSL y cliente VPN',
+        prioridad: 'media',
+        estado: 'abierto',
+        fecha: '2026-11-23',
+        equipo_id: 1,
+        equipo: { id: 1, nombre: 'Laptop Dell Latitude 5430', serial: 'EQ-001-DL', estado: 'disponible' },
+      },
+      {
+        id: 3,
+        numero: 'TK-9003-0',
+        asunto: 'Configuración de VLAN de invitados en sede norte',
+        prioridad: 'baja',
+        estado: 'cerrado',
+        fecha: '2026-11-20',
+        equipo_id: 4,
+        equipo: { id: 4, nombre: 'Router MikroTik RB4011', serial: 'EQ-004-MK', estado: 'disponible' },
+      },
+    ];
+
+    let state = {
+      mode: localStorage.getItem('app_mode') || 'real', // 'real' | 'demo'
+      token: localStorage.getItem('jwt_token') || '',
+      urls: JSON.parse(localStorage.getItem('ms_urls') || 'null') || { ...DEFAULT_URLS },
+      tickets: [],
+      equipos: [],
+    };
+
+    // =========================================================================
+    // INITIALIZATION
+    // =========================================================================
+    window.addEventListener('DOMContentLoaded', () => {
+      // Load saved URLs and token into UI
+      document.getElementById('urlUsuarios').value = state.urls.usuarios;
+      document.getElementById('urlTickets').value = state.urls.tickets;
+      document.getElementById('urlEquipos').value = state.urls.equipos;
+      document.getElementById('jwtTokenInput').value = state.token;
+
+      updateAuthBadge();
+      updateModeButtons();
+      refreshAllData();
+    });
+
+    // =========================================================================
+    // UI HELPERS & NAVIGATION
+    // =========================================================================
+    function toggleDrawer(id) {
+      const el = document.getElementById(id);
+      const other = id === 'authDrawer' ? 'configDrawer' : 'authDrawer';
+      document.getElementById(other).classList.add('hidden');
+      el.classList.toggle('hidden');
+    }
+
+    function switchTab(tab) {
+      const isTickets = tab === 'tickets';
+      document.getElementById('tabViewTickets').classList.toggle('hidden', !isTickets);
+      document.getElementById('tabViewEquipos').classList.toggle('hidden', isTickets);
+
+      const btnT = document.getElementById('tabBtnTickets');
+      const btnE = document.getElementById('tabBtnEquipos');
+
+      btnT.className = isTickets
+        ? 'px-4 py-2.5 text-sm font-semibold border-b-2 border-indigo-600 text-indigo-600 -mb-px transition'
+        : 'px-4 py-2.5 text-sm font-semibold border-b-2 border-transparent text-slate-500 hover:text-slate-700 -mb-px transition';
+
+      btnE.className = !isTickets
+        ? 'px-4 py-2.5 text-sm font-semibold border-b-2 border-indigo-600 text-indigo-600 -mb-px transition'
+        : 'px-4 py-2.5 text-sm font-semibold border-b-2 border-transparent text-slate-500 hover:text-slate-700 -mb-px transition';
+    }
+
+    function setAppMode(mode) {
+      state.mode = mode;
+      localStorage.setItem('app_mode', mode);
+      updateModeButtons();
+      document.getElementById('networkBanner').classList.add('hidden');
+
+      if (mode === 'demo' && !state.token) {
+        saveManualToken('eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.demo-token-parcial3');
+        document.getElementById('jwtTokenInput').value = state.token;
+      }
+
+      showToast(mode === 'demo' ? 'Modo Demo activado (datos locales)' : 'Modo API Real activado');
+      refreshAllData();
+    }
+
+    function updateModeButtons() {
+      const realBtn = document.getElementById('btnModeReal');
+      const demoBtn = document.getElementById('btnModeDemo');
+      if (state.mode === 'real') {
+        realBtn.className = 'px-3 py-1.5 rounded-lg text-xs font-semibold transition bg-indigo-600 text-white shadow';
+        demoBtn.className = 'px-3 py-1.5 rounded-lg text-xs font-semibold transition text-slate-300 hover:text-white';
+      } else {
+        demoBtn.className = 'px-3 py-1.5 rounded-lg text-xs font-semibold transition bg-emerald-600 text-white shadow';
+        realBtn.className = 'px-3 py-1.5 rounded-lg text-xs font-semibold transition text-slate-300 hover:text-white';
+      }
+    }
+
+    function saveUrls() {
+      state.urls = {
+        usuarios: document.getElementById('urlUsuarios').value.trim().replace(/\/$/, ''),
+        tickets: document.getElementById('urlTickets').value.trim().replace(/\/$/, ''),
+        equipos: document.getElementById('urlEquipos').value.trim().replace(/\/$/, ''),
+      };
+      localStorage.setItem('ms_urls', JSON.stringify(state.urls));
+      showToast('URLs de microservicios guardadas');
+    }
+
+    function resetUrls() {
+      state.urls = { ...DEFAULT_URLS };
+      document.getElementById('urlUsuarios').value = state.urls.usuarios;
+      document.getElementById('urlTickets').value = state.urls.tickets;
+      document.getElementById('urlEquipos').value = state.urls.equipos;
+      localStorage.setItem('ms_urls', JSON.stringify(state.urls));
+      showToast('URLs restauradas');
+    }
+
+    function saveManualToken(val) {
+      state.token = val.trim();
+      localStorage.setItem('jwt_token', state.token);
+      updateAuthBadge();
+    }
+
+    function clearToken() {
+      state.token = '';
+      localStorage.removeItem('jwt_token');
+      document.getElementById('jwtTokenInput').value = '';
+      updateAuthBadge();
+      showToast('Token eliminado (puedes probar error 401)');
+    }
+
+    function updateAuthBadge() {
+      const dot = document.getElementById('authDot');
+      const txt = document.getElementById('authBadgeText');
+      if (state.token) {
+        dot.className = 'w-2 h-2 rounded-full bg-emerald-400';
+        txt.textContent = 'JWT Activo';
+      } else {
+        dot.className = 'w-2 h-2 rounded-full bg-rose-500';
+        txt.textContent = 'Sin Token JWT';
+      }
+    }
+
+    function showToast(msg, isError = false) {
+      const toast = document.getElementById('toast');
+      const dot = document.getElementById('toastDot');
+      const text = document.getElementById('toastMsg');
+      text.textContent = msg;
+      dot.className = isError ? 'w-2 h-2 rounded-full bg-rose-400 shrink-0' : 'w-2 h-2 rounded-full bg-emerald-400 shrink-0';
+      toast.classList.remove('hidden');
+      clearTimeout(window._toastTimer);
+      window._toastTimer = setTimeout(() => toast.classList.add('hidden'), 3200);
+    }
+
+    function logHttpResponse(endpoint, status, data) {
+      const badge = document.getElementById('httpStatusBadge');
+      const label = document.getElementById('httpEndpointLabel');
+      const box = document.getElementById('httpResponseBox');
+
+      label.textContent = endpoint;
+      badge.textContent = `HTTP ${status}`;
+
+      if (status >= 200 && status < 300) {
+        badge.className = 'px-2 py-0.5 rounded-md text-[11px] font-mono font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30';
+        box.className = 'p-4 text-xs font-mono text-emerald-300 overflow-x-auto max-h-56 leading-relaxed';
+      } else if (status >= 400 && status < 500) {
+        badge.className = 'px-2 py-0.5 rounded-md text-[11px] font-mono font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30';
+        box.className = 'p-4 text-xs font-mono text-amber-200 overflow-x-auto max-h-56 leading-relaxed';
+      } else {
+        badge.className = 'px-2 py-0.5 rounded-md text-[11px] font-mono font-bold bg-rose-500/20 text-rose-300 border border-rose-500/30';
+        box.className = 'p-4 text-xs font-mono text-rose-200 overflow-x-auto max-h-56 leading-relaxed';
+      }
+
+      box.textContent = JSON.stringify(data, null, 2);
+    }
+
+    function incrementTicketNumber() {
+      const input = document.getElementById('ticketNumero');
+      const val = input.value.trim();
+      const match = val.match(/^(.*?)(\d+)$/);
+      if (match) {
+        const next = String(parseInt(match[2], 10) + 1).padStart(match[2].length, '0');
+        input.value = `${match[1]}${next}`;
+      } else {
+        input.value = `TK-${Math.floor(1000 + Math.random() * 9000)}`;
+      }
+    }
+
+    // =========================================================================
+    // API & DEMO DATA LAYER
+    // =========================================================================
+    function getAuthHeaders() {
+      const headers = { 'Content-Type': 'application/json' };
+      if (state.token) {
+        headers['Authorization'] = `Bearer ${state.token}`;
+      }
+      return headers;
+    }
+
+    async function handleLogin(e) {
+      e.preventDefault();
+      const email = document.getElementById('loginEmail').value.trim();
+      const password = document.getElementById('loginPassword').value;
+      const feedback = document.getElementById('loginFeedback');
+
+      if (state.mode === 'demo') {
+        const fakeToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.demo-auth-user';
+        saveManualToken(fakeToken);
+        document.getElementById('jwtTokenInput').value = fakeToken;
+        feedback.textContent = 'Autenticado en Modo Demo';
+        logHttpResponse('POST /auth/login', 200, { token: fakeToken, usuario: { email } });
+        showToast('Token generado en Modo Demo');
+        refreshAllData();
+        return;
+      }
+
+      try {
+        feedback.textContent = 'Autenticando...';
+        const res = await fetch(`${state.urls.usuarios}/auth/login`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, correo: email, password, clave: password }),
+        });
+        const data = await res.json().catch(() => ({}));
+        logHttpResponse('POST /auth/login', res.status, data);
+
+        const extractedToken = data.token || data.accessToken || data.jwt;
+        if (res.ok && extractedToken) {
+          saveManualToken(extractedToken);
+          document.getElementById('jwtTokenInput').value = extractedToken;
+          feedback.textContent = 'Token guardado correctamente';
+          showToast('Sesión iniciada con ms-usuarios');
+          refreshAllData();
+        } else {
+          feedback.textContent = data.error || data.mensaje || `Error ${res.status}`;
+          showToast(`Error de autenticación (${res.status})`, true);
+        }
+      } catch (err) {
+        feedback.textContent = 'No se pudo conectar a ms-usuarios';
+        logHttpResponse('POST /auth/login', 503, { error: 'ms-usuarios no responde o CORS bloqueado', detalle: err.message });
+        document.getElementById('networkBanner').classList.remove('hidden');
+      }
+    }
+
+    async function refreshAllData() {
+      const icon = document.getElementById('refreshIcon');
+      icon.classList.add('animate-spin');
+
+      if (state.mode === 'demo') {
+        if (state.equipos.length === 0) state.equipos = JSON.parse(JSON.stringify(DEMO_EQUIPOS_INITIAL));
+        if (state.tickets.length === 0) state.tickets = JSON.parse(JSON.stringify(DEMO_TICKETS_INITIAL));
+        updateEquipoSelector();
+        renderEquipos();
+        renderTickets();
+        updateKpis();
+        setTimeout(() => icon.classList.remove('animate-spin'), 250);
+        return;
+      }
+
+      // Real API mode
+      try {
+        const [ticketsRes, equiposRes] = await Promise.all([
+          fetch(`${state.urls.tickets}/tickets`, { headers: getAuthHeaders() }),
+          fetch(`${state.urls.equipos}/equipos`, { headers: getAuthHeaders() }),
+        ]);
+
+        const ticketsData = await ticketsRes.json().catch(() => []);
+        const equiposData = await equiposRes.json().catch(() => []);
+
+        logHttpResponse('GET /tickets', ticketsRes.status, ticketsData);
+
+        if (ticketsRes.ok) {
+          state.tickets = Array.isArray(ticketsData) ? ticketsData : (ticketsData.tickets || ticketsData.data || []);
+        } else {
+          state.tickets = [];
+        }
+
+        if (equiposRes.ok) {
+          state.equipos = Array.isArray(equiposData) ? equiposData : (equiposData.equipos || equiposData.data || []);
+        }
+
+        document.getElementById('networkBanner').classList.add('hidden');
+      } catch (err) {
+        document.getElementById('networkBanner').classList.remove('hidden');
+        logHttpResponse('GET /tickets', 503, {
+          error: 'Error de red o CORS al consultar microservicios locales',
+          detalle: err.message,
+        });
+      } finally {
+        updateEquipoSelector();
+        renderEquipos();
+        renderTickets();
+        updateKpis();
+        icon.classList.remove('animate-spin');
+      }
+    }
+
+    async function handleCreateTicket(e) {
+      e.preventDefault();
+      const btn = document.getElementById('btnSubmitTicket');
+      btn.disabled = true;
+
+      const payload = {
+        numero: document.getElementById('ticketNumero').value.trim(),
+        asunto: document.getElementById('ticketAsunto').value.trim(),
+        prioridad: document.getElementById('ticketPrioridad').value,
+        estado: document.getElementById('ticketEstado').value,
+        fecha: document.getElementById('ticketFecha').value,
+        equipo_id: parseInt(document.getElementById('ticketEquipoId').value, 10),
+      };
+
+      if (state.mode === 'demo') {
+        // Simulate microservice validation rules in Demo Mode
+        if (!state.token) {
+          logHttpResponse('POST /tickets', 401, { error: 'Token requerido o inválido' });
+          showToast('401 Unauthorized: Sin token JWT', true);
+          btn.disabled = false;
+          return;
+        }
+        if (state.tickets.some((t) => t.numero.toLowerCase() === payload.numero.toLowerCase())) {
+          logHttpResponse('POST /tickets', 409, { error: `El número de ticket '${payload.numero}' ya existe` });
+          showToast('409 Conflict: Ticket duplicado', true);
+          btn.disabled = false;
+          return;
+        }
+        const eq = state.equipos.find((item) => item.id === payload.equipo_id);
+        if (!eq) {
+          logHttpResponse('POST /tickets', 404, { error: `Equipo con id ${payload.equipo_id} no encontrado en ms-equipos` });
+          showToast('404 Not Found: Equipo inexistente', true);
+          btn.disabled = false;
+          return;
+        }
+        if (eq.estado === 'mantenimiento' || eq.estado === 'inactivo') {
+          logHttpResponse('POST /tickets', 400, { error: `El equipo '${eq.nombre}' no está disponible (estado: ${eq.estado})` });
+          showToast('400 Bad Request: Equipo no disponible', true);
+          btn.disabled = false;
+          return;
+        }
+
+        const created = {
+          id: state.tickets.length + 1,
+          ...payload,
+          equipo: { ...eq },
+        };
+        state.tickets.unshift(created);
+        logHttpResponse('POST /tickets', 201, created);
+        showToast(`Ticket ${created.numero} creado (201)`);
+        document.getElementById('ticketAsunto').value = '';
+        incrementTicketNumber();
+        renderTickets();
+        updateKpis();
+        btn.disabled = false;
+        return;
+      }
+
+      // Real API call to ms-tickets
+      try {
+        const res = await fetch(`${state.urls.tickets}/tickets`, {
+          method: 'POST',
+          headers: getAuthHeaders(),
+          body: JSON.stringify(payload),
+        });
+        const data = await res.json().catch(() => ({}));
+        logHttpResponse('POST /tickets', res.status, data);
+
+        if (res.ok) {
+          showToast(`Ticket creado (${res.status})`);
+          document.getElementById('ticketAsunto').value = '';
+          incrementTicketNumber();
+          await refreshAllData();
+        } else {
+          showToast(`Error HTTP ${res.status}: ${data.error || data.mensaje || 'Revisar respuesta'}`, true);
+        }
+      } catch (err) {
+        logHttpResponse('POST /tickets', 503, { error: 'ms-tickets no responde o CORS bloqueado', detalle: err.message });
+        document.getElementById('networkBanner').classList.remove('hidden');
+        showToast('Error de conexión con ms-tickets', true);
+      } finally {
+        btn.disabled = false;
+      }
+    }
+
+    async function handleCreateEquipo(e) {
+      e.preventDefault();
+      const payload = {
+        nombre: document.getElementById('equipoNombre').value.trim(),
+        serial: document.getElementById('equipoSerial').value.trim(),
+        codigo: document.getElementById('equipoSerial').value.trim(),
+        estado: document.getElementById('equipoEstado').value,
+      };
+
+      if (state.mode === 'demo') {
+        const nextId = state.equipos.reduce((max, item) => Math.max(max, item.id), 0) + 1;
+        const created = { id: nextId, ...payload };
+        state.equipos.push(created);
+        logHttpResponse('POST /equipos', 201, created);
+        showToast(`Equipo #${nextId} agregado`);
+        e.target.reset();
+        updateEquipoSelector();
+        renderEquipos();
+        return;
+      }
+
+      try {
+        const res = await fetch(`${state.urls.equipos}/equipos`, {
+          method: 'POST',
+          headers: getAuthHeaders(),
+          body: JSON.stringify(payload),
+        });
+        const data = await res.json().catch(() => ({}));
+        logHttpResponse('POST /equipos', res.status, data);
+        if (res.ok) {
+          showToast(`Equipo creado (${res.status})`);
+          e.target.reset();
+          await refreshAllData();
+        } else {
+          showToast(`Error ${res.status} al crear equipo`, true);
+        }
+      } catch (err) {
+        logHttpResponse('POST /equipos', 503, { error: 'ms-equipos no responde', detalle: err.message });
+        showToast('Error de conexión con ms-equipos', true);
+      }
+    }
+
+    // =========================================================================
+    // RENDERING
+    // =========================================================================
+    function updateKpis() {
+      const total = state.tickets.length;
+      const abiertos = state.tickets.filter((t) => t.estado === 'abierto').length;
+      const alta = state.tickets.filter((t) => t.prioridad === 'alta').length;
+      const cerrados = state.tickets.filter((t) => t.estado === 'cerrado').length;
+
+      document.getElementById('kpiTotal').textContent = total;
+      document.getElementById('kpiAbiertos').textContent = abiertos;
+      document.getElementById('kpiAlta').textContent = alta;
+      document.getElementById('kpiCerrados').textContent = cerrados;
+      document.getElementById('badgeCountTickets').textContent = total;
+      document.getElementById('badgeCountEquipos').textContent = state.equipos.length;
+    }
+
+    function updateEquipoSelector() {
+      const select = document.getElementById('equipoQuickSelect');
+      if (state.equipos.length === 0) {
+        select.innerHTML = '<option value="">Sin equipos cargados (usa ID manual)</option>';
+        return;
+      }
+      select.innerHTML = state.equipos
+        .map((eq) => `<option value="${eq.id}">#${eq.id} · ${escapeHtml(eq.nombre || 'Equipo')} (${escapeHtml(eq.estado || 'activo')})</option>`)
+        .join('');
+    }
+
+    function renderTickets() {
+      const container = document.getElementById('ticketsListContainer');
+      const query = document.getElementById('searchTickets').value.trim().toLowerCase();
+      const filterEstado = document.getElementById('filterEstado').value;
+      const filterPrioridad = document.getElementById('filterPrioridad').value;
+
+      const filtered = state.tickets.filter((t) => {
+        if (filterEstado !== 'todos' && t.estado !== filterEstado) return false;
+        if (filterPrioridad !== 'todas' && t.prioridad !== filterPrioridad) return false;
+        if (query) {
+          const eqName = (t.equipo && t.equipo.nombre ? t.equipo.nombre : '').toLowerCase();
+          const match =
+            (t.numero || '').toLowerCase().includes(query) ||
+            (t.asunto || '').toLowerCase().includes(query) ||
+            eqName.includes(query) ||
+            String(t.equipo_id || '').includes(query);
+          if (!match) return false;
+        }
+        return true;
+      });
+
+      if (filtered.length === 0) {
+        container.innerHTML = `
+          <div class="text-center py-10 px-4 rounded-2xl border border-dashed border-slate-300 bg-slate-50/50">
+            <p class="text-sm font-semibold text-slate-700">No hay tickets para mostrar</p>
+            <p class="text-xs text-slate-500 mt-1">Crea uno nuevo desde el formulario izquierdo o verifica tu token JWT.</p>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = filtered
+        .map((t, index) => {
+          const prioBadge = getPrioridadBadge(t.prioridad);
+          const estadoBadge = getEstadoBadge(t.estado);
+          const eq = t.equipo || state.equipos.find((e) => e.id === t.equipo_id);
+          const eqLabel = eq
+            ? `${escapeHtml(eq.nombre || 'Equipo #' + t.equipo_id)} ${eq.serial || eq.codigo ? `(${escapeHtml(eq.serial || eq.codigo)})` : ''}`
+            : `Equipo ID #${t.equipo_id ?? 'N/A'}`;
+
+          return `
+            <article class="p-4 rounded-xl border border-slate-200 hover:border-indigo-300 bg-white transition shadow-2xs space-y-2.5">
+              <div class="flex flex-wrap items-start justify-between gap-2">
+                <div class="flex items-center gap-2">
+                  <span class="px-2.5 py-0.5 rounded-lg bg-slate-100 text-slate-800 font-mono text-xs font-bold">
+                    ${escapeHtml(t.numero || `#${t.id}`)}
+                  </span>
+                  ${prioBadge}
+                  ${estadoBadge}
+                </div>
+                <span class="text-xs text-slate-400 font-mono">${escapeHtml(String(t.fecha || '').slice(0, 10))}</span>
+              </div>
+
+              <h3 class="text-sm font-semibold text-slate-900 leading-snug">${escapeHtml(t.asunto || '')}</h3>
+
+              <div class="pt-2 border-t border-slate-100 flex flex-wrap items-center justify-between gap-2 text-xs">
+                <div class="inline-flex items-center gap-1.5 text-slate-600 bg-slate-50 px-2.5 py-1 rounded-lg border border-slate-200/70">
+                  <svg class="w-3.5 h-3.5 text-indigo-500 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 17.25v1.007a3 3 0 01-.879 2.122L7.5 21h9l-.621-.621A3 3 0 0115 18.257V17.25m6-12V15a2.25 2.25 0 01-2.25 2.25H5.25A2.25 2.25 0 013 15V5.25m18 0A2.25 2.25 0 0018.75 3H5.25A2.25 2.25 0 003 5.25m18 0V12a2.25 2.25 0 01-2.25 2.25H5.25A2.25 2.25 0 013 12V5.25" />
+                  </svg>
+                  <span class="font-medium">${eqLabel}</span>
+                </div>
+
+                <button type="button" onclick="openTicketJson(${index})"
+                  class="text-indigo-600 hover:text-indigo-800 font-semibold text-xs px-2.5 py-1 rounded-lg hover:bg-indigo-50 transition">
+                  Ver JSON compuesto
+                </button>
+              </div>
+            </article>
+          `;
+        })
+        .join('');
+
+      window._lastFilteredTickets = filtered;
+    }
+
+    function renderEquipos() {
+      const tbody = document.getElementById('equiposTableBody');
+      if (state.equipos.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="5" class="py-8 text-center text-slate-400">No hay equipos registrados o falta token JWT.</td>
+          </tr>
+        `;
+        return;
+      }
+
+      tbody.innerHTML = state.equipos
+        .map((eq) => {
+          const isOk = eq.estado === 'disponible' || eq.estado === 'activo';
+          const badgeClass = isOk
+            ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+            : 'bg-amber-50 text-amber-700 border-amber-200';
+          return `
+            <tr class="hover:bg-slate-50/80">
+              <td class="py-2.5 px-3.5 font-mono font-bold text-slate-700">#${eq.id}</td>
+              <td class="py-2.5 px-3.5 font-medium text-slate-900">${escapeHtml(eq.nombre || 'Sin nombre')}</td>
+              <td class="py-2.5 px-3.5 font-mono text-slate-500">${escapeHtml(eq.serial || eq.codigo || '—')}</td>
+              <td class="py-2.5 px-3.5">
+                <span class="px-2 py-0.5 rounded-full text-[11px] font-semibold border ${badgeClass}">
+                  ${escapeHtml(eq.estado || 'disponible')}
+                </span>
+              </td>
+              <td class="py-2.5 px-3.5 text-right">
+                <button type="button" onclick="selectEquipoForTicket(${eq.id})"
+                  class="text-indigo-600 hover:text-indigo-800 font-semibold hover:underline">
+                  Usar en ticket
+                </button>
+              </td>
+            </tr>
+          `;
+        })
+        .join('');
+    }
+
+    function selectEquipoForTicket(id) {
+      document.getElementById('ticketEquipoId').value = id;
+      document.getElementById('equipoQuickSelect').value = String(id);
+      showToast(`Equipo #${id} seleccionado en el formulario`);
+    }
+
+    function getPrioridadBadge(prio) {
+      if (prio === 'alta') {
+        return '<span class="px-2 py-0.5 rounded-full text-[11px] font-semibold bg-rose-50 text-rose-700 border border-rose-200">Alta</span>';
+      }
+      if (prio === 'media') {
+        return '<span class="px-2 py-0.5 rounded-full text-[11px] font-semibold bg-amber-50 text-amber-700 border border-amber-200">Media</span>';
+      }
+      return '<span class="px-2 py-0.5 rounded-full text-[11px] font-semibold bg-sky-50 text-sky-700 border border-sky-200">Baja</span>';
+    }
+
+    function getEstadoBadge(estado) {
+      if (estado === 'abierto') {
+        return '<span class="px-2 py-0.5 rounded-full text-[11px] font-semibold bg-indigo-50 text-indigo-700 border border-indigo-200">Abierto</span>';
+      }
+      return '<span class="px-2 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">Cerrado</span>';
+    }
+
+    // =========================================================================
+    // MODAL & CLIPBOARD
+    // =========================================================================
+    function openTicketJson(filteredIndex) {
+      const ticket = (window._lastFilteredTickets || [])[filteredIndex];
+      if (!ticket) return;
+      document.getElementById('jsonModalTitle').textContent = `JSON · Ticket ${ticket.numero || ticket.id}`;
+      document.getElementById('jsonModalContent').textContent = JSON.stringify(ticket, null, 2);
+      document.getElementById('jsonModal').classList.remove('hidden');
+    }
+
+    function closeJsonModal() {
+      document.getElementById('jsonModal').classList.add('hidden');
+    }
+
+    function copyModalJson() {
+      const text = document.getElementById('jsonModalContent').textContent;
+      const textarea = document.createElement('textarea');
+      textarea.value = text;
+      document.body.appendChild(textarea);
+      textarea.select();
+      document.execCommand('copy');
+      document.body.removeChild(textarea);
+      showToast('JSON copiado al portapapeles');
+    }
+
+    function escapeHtml(str) {
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+  </script>
+</body>
+</html>
