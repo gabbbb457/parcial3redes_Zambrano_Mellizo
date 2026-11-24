@@ -24,15 +24,17 @@ async function findByNumero(numero) {
 
 async function create(t) {
   const [resultado] = await pool.query(
-    'INSERT INTO tickets (numero, asunto, prioridad, estado, fecha) VALUES (?, ?, ?, ?, ?)',
-    [t.numero, t.asunto, t.prioridad, t.estado, t.fecha]);
+    'INSERT INTO tickets (numero, asunto, prioridad, estado, fecha, equipo_id) VALUES (?, ?, ?, ?, ?, ?)',
+    [t.numero, t.asunto, t.prioridad, t.estado, t.fecha, t.equipo_id]
+  );
   return findById(resultado.insertId);
 }
 
 async function update(id, t) {
   const [resultado] = await pool.query(
-    'UPDATE tickets SET numero = ?, asunto = ?, prioridad = ?, estado = ?, fecha = ? WHERE id = ?',
-    [t.numero, t.asunto, t.prioridad, t.estado, t.fecha, id]);
+    'UPDATE tickets SET numero = ?, asunto = ?, prioridad = ?, estado = ?, fecha = ?, equipo_id = ? WHERE id = ?',
+    [t.numero, t.asunto, t.prioridad, t.estado, t.fecha, t.equipo_id, id]
+  );
   if (resultado.affectedRows === 0) return null;
   return findById(id);
 }
