@@ -8,25 +8,27 @@ function leerId(req) {
   return id;
 }
 
-// GET /tickets  y  GET /tickets?prioridad=alta
 async function listar(req, res) {
-  res.status(200).json(await service.listar({ prioridad: req.query.prioridad }));
+  res.status(200).json(
+    await service.listar({ prioridad: req.query.prioridad }, req.headers.authorization)
+  );
 }
 
-// GET /tickets/:id
 async function obtener(req, res) {
-  res.status(200).json(await service.obtener(leerId(req)));
+  res.status(200).json(
+    await service.obtener(leerId(req), req.headers.authorization)
+  );
 }
 
-// POST /tickets
 async function crear(req, res) {
-  const nuevo = await service.crear(req.body);
+  const nuevo = await service.crear(req.body, req.headers.authorization);
   res.status(201).location(`${req.baseUrl}/${nuevo.id}`).json(nuevo);
 }
 
-// PUT /tickets/:id
 async function actualizar(req, res) {
-  res.status(200).json(await service.actualizar(leerId(req), req.body));
+  res.status(200).json(
+    await service.actualizar(leerId(req), req.body, req.headers.authorization)
+  );
 }
 
 // DELETE /tickets/:id
